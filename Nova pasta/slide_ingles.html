@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review on GANs - Souza et al.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* CONFIGURAÇÃO BASE - Estilo Consultoria de Elite */
+        * { box-sizing: border-box; }
+        body {
+            background-color: #0a0a0c;
+            display: grid;
+            gap: 40px;
+            grid-template-columns: 1fr;
+            margin: 0;
+            padding: 40px 0;
+            place-items: center;
+            color: #e2e8f0;
+        }
+
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            background-color: #0f172a;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            font-family: 'Lato', sans-serif;
+            overflow: hidden;
+            padding: 60px;
+            position: relative;
+        }
+
+        /* DESIGN DE FUNDO - Visual Tech/AI */
+        .slide-container::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .slide-container::after {
+            content: '';
+            position: absolute;
+            bottom: 30px;
+            left: 60px;
+            width: 100px;
+            height: 4px;
+            background: #22c55e; /* Verde Tech */
+            z-index: 1;
+        }
+
+        .slide-container > * { position: relative; z-index: 2; }
+
+        /* TIPOGRAFIA */
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            color: #f8fafc;
+            margin: 0;
+        }
+
+        h1 { font-size: 58px; line-height: 1.1; margin-bottom: 20px; font-weight: 700; }
+        .slide-title { font-size: 38px; font-weight: 600; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; color: #22c55e; }
+        h3 { font-size: 28px; color: #94a3b8; margin-bottom: 15px; }
+        p, li { font-size: 20px; line-height: 1.6; color: #cbd5e1; }
+
+        /* LAYOUTS ESPECÍFICOS */
+        .content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; }
+
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; width: 100%; align-items: start; }
+        
+        .tiled-content { display: flex; gap: 30px; width: 100%; }
+        .tile {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 22px;
+            transition: transform 0.3s ease;
+        }
+        .tile .icon { font-size: 34px; color: #22c55e; margin-bottom: 8px; }
+
+        .image-wrapper { border-radius: 12px; overflow: hidden; border: 1px solid #334155; height: 380px; width: 100%; }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Estilo para gráficos e tabelas */
+        .table-layout table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .table-layout th { background: #1e293b; color: #22c55e; padding: 20px; text-align: left; font-size: 22px; }
+        .table-layout td { padding: 20px; border-bottom: 1px solid #334155; font-size: 18px; }
+
+        /* Layout Bleed Image Right */
+        .bleed-image-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0; align-items: start; }
+        .bleed-image-layout .content-container { padding: 60px; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .bleed-image-layout img { width: 100%; height: 720px; object-fit: cover; border-radius: 0; }
+
+        /* Estilo da Capa */
+        .title-slide-content { text-align: left; max-width: 900px; }
+        .team-list { margin-top: 40px; border-top: 1px solid #334155; padding-top: 20px; }
+        .team-list span { color: #22c55e; font-weight: 600; margin-right: 20px; }
+
+        /* Diagrama GAN Otimizado */
+        .gan-flow-container {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            margin-top: 15px;
+        }
+        .gan-node {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            color: #f8fafc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            white-space: नाहीत;
+        }
+        .gan-node.noise { border-color: #475569; color: #cbd5e1; }
+        .gan-node.generator { border-color: #22c55e; color: #22c55e; }
+        .gan-node.fake { border-color: #ef4444; color: #ef4444; }
+        .gan-node.discriminator { border-color: #3b82f6; color: #3b82f6; }
+        .gan-node.real { border-color: #22c55e; color: #22c55e; }
+        
+        .gan-arrow-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+            gap: 2px;
+        }
+        .gan-arrow-group i {
+            font-size: 16px;
+            color: #94a3b8;
+        }
+
+        /* Estilo customizado para o Slide 8 (Grid 2x2) */
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 40px 60px;
+            width: 100%;
+        }
+        .grid-item h3 {
+            color: #22c55e;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .grid-item h4 {
+            font-family: 'Poppins', sans-serif;
+            color: #f8fafc;
+            font-size: 22px;
+            margin: 0 0 5px 0;
+            font-weight: 600;
+        }
+        .grid-item p {
+            color: #94a3b8;
+            font-size: 18px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 1 -->
+<div class="slide-container" id="slide1" style="justify-content: center; background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('http://googleusercontent.com/image_collection/image_retrieval/5658372142177268669'); background-size: cover;">
+    <div class="title-slide-content">
+        <h1>A Review on Generative Adversarial Networks (GANs) for Image Generation</h1>
+        <p style="font-size: 24px; color: #94a3b8;">Analysis of Fundamentals, Evolution, and Challenges based on the work by Souza et al. (2023)</p>
+        <div class="team-list">
+            <p><strong>Team:</strong></p>
+            <p><span><i class="fas fa-user-circle"></i> David  Moreto</span> 
+               <span><i class="fas fa-user-circle"></i> Lucas Alves</span> 
+               <span><i class="fas fa-user-circle"></i> Pablo Mateo</span>
+               <span><i class="fas fa-user-circle"></i> Pedro Valverde</span></p>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide-container" id="slide2">
+    <h2 class="slide-title">Scientific Relevance and Authorship</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3>Reference Base</h3>
+                <p>The analyzed work is a comprehensive literature review (survey) that consolidates nearly a decade of progress in generative models.</p>
+                <ul style="list-style: none; padding: 0; margin-top: 20px;">
+                    <li style="margin-bottom: 15px;"><i class="fas fa-university" style="color: #22c55e;"></i> <strong>Institution:</strong> UFABC</li>
+                    <li style="margin-bottom: 15px;"><i class="fas fa-book" style="color: #22c55e;"></i> <strong>Journal:</strong> Computers & Graphics (Elsevier)</li>
+                    <li style="margin-bottom: 15px;"><i class="fas fa-star" style="color: #22c55e;"></i> <strong>Impact:</strong> Qualis A1 / High Impact Factor</li>
+                </ul>
+            </div>
+            <div style="background: rgba(34, 197, 94, 0.05); padding: 40px; border-radius: 20px; border: 1px dashed #22c55e;">
+                <h4 style="color: #22c55e; margin-top: 0;">Authors</h4>
+                <p style="font-size: 22px;">Vinicius L. T. de Souza<br>Bruno A. D. Marques<br>Harlen C. Batagelo<br>João Paulo Gois</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide-container" id="slide3">
+    <h2 class="slide-title">The Challenge of Image Generation</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3>Why is it Difficult?</h3>
+                <p>Historically, generating realistic images required complex manual modeling. Generative AI shifted the paradigm toward data distribution learning.</p>
+                <ul style="margin-top: 20px;">
+                    <li><strong>Computational Realism:</strong> Capturing textures and global structures simultaneously.</li>
+                    <li><strong>Role of the Survey:</strong> Organizing the "profusion" of models published in recent years.</li>
+                    <li><strong>Objective:</strong> Providing a guide for beginners and professionals on the state of the art.</li>
+                </ul>
+            </div>
+            <div class="image-wrapper" style="height: 450px;">
+                <img src="2-Figure1-1.png" alt="Image-to-image translation example">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide-container" id="slide4">
+    <h2 class="slide-title" style="margin-bottom: 15px;">Fundamentals of GANs</h2>
+    <div class="content-area" style="justify-content: space-between;">
+        <div class="tiled-content">
+            <div class="tile" style="padding: 22px;">
+                <div class="icon" style="font-size: 34px; margin-bottom: 8px;"><i class="fas fa-paint-brush"></i></div>
+                <h3 style="font-size: 22px;">The Generator (G)</h3>
+                <p style="font-size: 16px;">The <strong>"Forger"</strong>. Tries to create synthetic samples from random noise that are indistinguishable from real data.</p>
+            </div>
+            <div class="tile" style="border-color: #22c55e; padding: 22px;">
+                <div class="icon" style="font-size: 34px; margin-bottom: 8px;"><i class="fas fa-search"></i></div>
+                <h3 style="font-size: 22px;">The Discriminator (D)</h3>
+                <p style="font-size: 16px;">The <strong>"Detective"</strong>. Learns to distinguish between real images from the database and fake ones created by the Generator.</p>
+            </div>
+            <div class="tile" style="padding: 22px;">
+                <div class="icon" style="font-size: 34px; margin-bottom: 8px;"><i class="fas fa-bolt"></i></div>
+                <h3 style="font-size: 22px;">Adversarial Process</h3>
+                <p style="font-size: 16px;">Constant competition where both evolve. The Generator seeks to deceive, and the Discriminator seeks to detect.</p>
+            </div>
+        </div>
+
+        <!-- DIAGRAMA GAN -->
+        <div class="gan-flow-container">
+            <div class="gan-node noise">
+                <i class="fas fa-random"></i> Noise (Z)
+            </div>
+            
+            <div class="gan-arrow-group">
+                <span>Input</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+            
+            <div class="gan-node generator">
+                <i class="fas fa-cogs"></i> Generator (G)
+            </div>
+            
+            <div class="gan-arrow-group">
+                <span>Creates</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+            
+            <div class="gan-node fake">
+                <i class="fas fa-image"></i> Fake Image
+            </div>
+            
+            <div class="gan-arrow-group">
+                <span>Evaluates</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+            
+            <div class="gan-node discriminator">
+                <i class="fas fa-shield-alt"></i> Discriminator (D)
+            </div>
+            
+            <div class="gan-arrow-group">
+                <span>Compares</span>
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            
+            <div class="gan-node real">
+                <i class="fas fa-database"></i> Real Images (X)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide-container" id="slide5">
+    <h2 class="slide-title">From DCGAN to Modern Models</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div class="image-wrapper" style="height: 450px;">
+                <img src="hqdefault.jpg" alt="GAN Faces Evolution">
+            </div>
+            <div>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 25px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px;">
+                        <strong style="color: #22c55e;">2014: First GANs</strong><br>Proposed by Ian Goodfellow. Blurry, low-resolution samples.
+                    </li>
+                    <li style="margin-bottom: 25px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px;">
+                        <strong style="color: #22c55e;">DCGAN</strong><br>Introduction of Convolutional Networks, stabilizing training and enabling larger scale.
+                    </li>
+                    <li style="margin-bottom: 25px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px;">
+                        <strong style="color: #22c55e;">StyleGAN & Progressive GAN</strong><br>Ability to generate photorealistic images in high resolution (1024x1024).
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide-container" id="slide6">
+    <h2 class="slide-title">Where are GANs Applied?</h2>
+    <div class="content-area">
+        <div class="tiled-content">
+            <div class="tile">
+                <div class="icon"><i class="fas fa-exchange-alt"></i></div>
+                <h3>Image Translation</h3>
+                <p>Domain conversion (e.g., map to aerial photo, black and white to colorized).</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fas fa-compress-arrows-alt"></i></div>
+                <h3>Super-Resolution</h3>
+                <p>Restoration of old photos and resolution enhancement while maintaining sharp details.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fas fa-database"></i></div>
+                <h3>Synthetic Data</h3>
+                <p>Generation of datasets to train other AIs where real data is scarce.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide-container bleed-image-layout" id="slide7">
+    <div class="content-container">
+        <h2 class="slide-title" style="color: #ef4444;">What AI has not yet solved</h2>
+        <div class="content-area" style="justify-content: start;">
+            <h3>Mode Collapse</h3>
+            <p>The generator "gets stuck" and starts producing repetitive or nearly identical images to deceive the discriminator.</p>
+            <p style="margin-top: 20px;"><strong>Other Challenges:</strong></p>
+            <ul style="color: #94a3b8;">
+                <li>High Computational Cost (days of training).</li>
+                <li>Evaluation Difficulty (metrics like FID are not always perfect).</li>
+            </ul>
+        </div>
+    </div>
+    <div class="image-container">
+        <img src="cristina-gottardi-CSpjU6hYo_0-unsplash.jpg" alt="Mode Collapse Visualization">
+    </div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide-container" id="slide8">
+    <div class="content-area">
+        <div class="grid-2x2">
+            <div class="grid-item">
+                <h3>Legacy</h3>
+                <h4>AI Development</h4>
+                <p>Important role in generative AI</p>
+            </div>
+            <div class="grid-item">
+                <h3>Impact</h3>
+                <h4>Real-World Applications</h4>
+                <p>Computer Graphics & Video Games</p>
+            </div>
+            <div class="grid-item">
+                <h3>Evolution</h3>
+                <h4>New Technologies</h4>
+                <p>Beyond GANs: New Generative Models</p>
+            </div>
+            <div class="grid-item">
+                <h3>Future</h3>
+                <h4>Better AI Models</h4>
+                <p>Combining Different Approaches</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide-container" id="slide9">
+    <h2 class="slide-title">References</h2>
+    <div class="content-area table-layout">
+        <table>
+            <thead>
+                <tr>
+                    <th>Base Paper</th>
+                    <th>Publication</th>
+                    <th>Context</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Souza, V. L. T. et al. (2023)</strong><br>"A review on Generative Adversarial Networks for image generation"</td>
+                    <td>Computers & Graphics<br>Elsevier</td>
+                    <td>Detailed survey on fundamentals and applications in Computer Graphics.</td>
+                </tr>
+                <tr>
+                    <td>Goodfellow et al. (2014)</td>
+                    <td>NIPS</td>
+                    <td>Original work that proposed the GAN architecture.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide-container" id="slide10" style="text-align: center; align-items: center; justify-content: center;">
+    <h1 style="font-size: 100px; color: #22c55e;">Questions?</h1>
+    <p style="font-size: 28px;">Thank you for your attention!</p>
+    <div style="margin-top: 50px; font-family: 'Poppins', sans-serif; letter-spacing: 2px; color: #64748b;">
+        CEFET-MG | COMPUTER ENGINEERING | 2026
+    </div>
+</div>
+
+</body>
+</html>
